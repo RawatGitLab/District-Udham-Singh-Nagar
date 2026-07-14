@@ -1,14 +1,14 @@
 # 🗺️ District Udham-Singh-Nagar – GIS Viewer
 
-An interactive, map-based portal for **Udham-Singh-Nagar District**, built with React, TypeScript, Leaflet, and the Google Gemini API. The app lets citizens and administrators explore geospatial data, layers, and district information through a fast, modern web interface.
+An interactive, map-based portal for **Udham-Singh-Nagar District**, built with React, TypeScript and Leaflet. The app lets citizens and administrators explore geospatial data, layers, and district information through a fast, modern web interface.
 
-> **Live demo:** https://district-Udham-Singh-Nagar.onrender.com/
+> **Live demo:** https://district-udham-singh-nagar.onrender.com/
 
 ---
 
 ## 📖 About
 
-This repository hosts the **Udham-Singh-Nagar GIS Viewer** — a web application for visualizing geographic and administrative data for Udham-Singh-Nagar District, Uttarakhand. It combines an interactive Leaflet map with an Express/Node backend and Gemini-powered AI capabilities, and was bootstrapped from the [`google-gemini/aistudio-repository-template`](https://github.com/google-gemini/aistudio-repository-template).
+This repository hosts the **Udham-Singh-Nagar GIS Viewer** — a web application for visualizing geographic and administrative data for Udham-Singh-Nagar District, Uttarakhand.
 
 ## ✨ Features
 
@@ -26,7 +26,6 @@ This repository hosts the **Udham-Singh-Nagar GIS Viewer** — a web application
 |---|---|
 | Frontend | React 19, TypeScript, Vite, Tailwind CSS |
 | Mapping | Leaflet, proj4 |
-| AI | Google Gemini (`@google/genai`) |
 | Backend | Node.js, Express, tsx |
 | Database | MongoDB |
 | Animation / UI | Motion, Lucide React |
@@ -54,7 +53,6 @@ District-Udham-Singh-Nagar/
 
 - [Node.js](https://nodejs.org/) (LTS recommended)
 - npm
-- A [Gemini API key](https://aistudio.google.com/apikey)
 
 ### Installation
 
@@ -79,7 +77,6 @@ cp .env.example .env
 
 | Variable | Description |
 |---|---|
-| `GEMINI_API_KEY` | Required for Gemini AI API calls |
 | `APP_URL` | The URL where the app is hosted (used for self-referential links/callbacks) |
 
 ### Available Scripts
