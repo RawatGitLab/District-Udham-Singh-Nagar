@@ -18,6 +18,7 @@ interface MapComponentProps {
   measureMode: "none" | "distance" | "area";
   measurePoints: { lat: number; lng: number }[];
   setMeasurePoints: React.Dispatch<React.SetStateAction<{ lat: number; lng: number }[]>>;
+  resetCounter: number;
 }
 
 export default function MapComponent({
@@ -34,7 +35,8 @@ export default function MapComponent({
   isSidebarCollapsed,
   measureMode,
   measurePoints,
-  setMeasurePoints
+  setMeasurePoints,
+  resetCounter
 }: MapComponentProps) {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<L.Map | null>(null);
@@ -42,6 +44,7 @@ export default function MapComponent({
   const geojsonLayersRef = useRef<Record<string, L.GeoJSON>>({});
   const selectionHighlightRef = useRef<L.Layer | null>(null);
   const measureGroupRef = useRef<L.FeatureGroup | null>(null);
+  const hasInitiallyFitBoundsRef = useRef<boolean>(false);
 
   const [mouseCoords, setMouseCoords] = useState<{ lat: number; lng: number } | null>(null);
   const [zoomLevel, setZoomLevel] = useState<number>(9);
@@ -129,6 +132,11 @@ export default function MapComponent({
     }
   }, [activeBaseMap, baseMaps]);
 
+  // Reset fit-bounds lock when features or resetCounter changes
+  useEffect(() => {
+    hasInitiallyFitBoundsRef.current = false;
+  }, [features, resetCounter]);
+
   // 3. Populate and styling GIS layers from database
   useEffect(() => {
     const map = mapInstanceRef.current;
@@ -163,12 +171,15 @@ export default function MapComponent({
       const geoJsonLayer = L.geoJSON(geoJsonData, {
         interactive: measureMode === "none",
         style: (feature: any) => {
+          const isPolygon = layerConf.type === "polygon";
+          const isLine = layerConf.type === "linestring";
           return {
             color: layerConf.color,
-            fillColor: layerConf.fillColor || layerConf.color,
+            fillColor: isPolygon || isLine ? "transparent" : (layerConf.fillColor || layerConf.color),
             weight: layerConf.weight,
             opacity: layerConf.opacity,
-            fillOpacity: layerConf.fillOpacity * layerConf.opacity,
+            fillOpacity: isPolygon || isLine ? 0 : (layerConf.fillOpacity * layerConf.opacity),
+            fill: !isPolygon && !isLine,
           };
         },
         pointToLayer: (feature: any, latlng: L.LatLng) => {
@@ -223,12 +234,13 @@ export default function MapComponent({
     });
 
     // Make map bounds responsive to features loaded (only on initial search or reset to avoid jarring navigation)
-    if (features.length > 0) {
+    if (features.length > 0 && !hasInitiallyFitBoundsRef.current) {
       try {
         const dummyGroup = new L.FeatureGroup(Object.values(geojsonLayersRef.current) as L.Layer[]);
         const bounds = dummyGroup.getBounds();
         if (bounds.isValid()) {
           map.fitBounds(bounds, { padding: [30, 30], maxZoom: 14 });
+          hasInitiallyFitBoundsRef.current = true;
         }
       } catch (err) {
         console.warn("Could not calculate bounds:", err);

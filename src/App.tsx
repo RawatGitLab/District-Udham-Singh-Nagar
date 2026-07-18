@@ -25,11 +25,12 @@ export default function App() {
   const [error, setError] = useState<string | null>(null);
 
   // Map & Interaction state
-  const [activeBaseMap, setActiveBaseMap] = useState<string>("osm");
+  const [activeBaseMap, setActiveBaseMap] = useState<string>("satellite");
   const [selectedFeature, setSelectedFeature] = useState<GisFeature | null>(null);
   const [hoveredFeature, setHoveredFeature] = useState<GisFeature | null>(null);
   const [isTableCollapsed, setIsTableCollapsed] = useState<boolean>(true);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState<boolean>(true);
+  const [resetCounter, setResetCounter] = useState<number>(0);
 
   // Dynamic Measurement state (Distance & Area)
   const [measureMode, setMeasureMode] = useState<"none" | "distance" | "area">("none");
@@ -216,10 +217,17 @@ export default function App() {
         fillColor = `hsl(${hue}, 70%, 65%)`;
       }
 
+      // Overriding for polygon layers (hollow, no fill, only white boundary color)
+      if (type === "polygon") {
+        color = "#ffffff";
+        fillColor = "transparent";
+        fillOpacity = 0;
+      }
+
       return {
         id: `layer-${index}-${name.replace(/\s+/g, '-')}`,
         name: name,
-        visible: name === "USN-District-Boundary" || name === "USN-Landuse-Agriculture",
+        visible: name.toLowerCase() === "usn-district-boundary",
         type: type,
         color: color,
         fillColor: fillColor,
@@ -281,8 +289,18 @@ export default function App() {
     setHoveredFeature(null);
     setMeasureMode("none");
     setMeasurePoints([]);
-    // Simple state refresh to reset sliders or zoom
-    setLayers((prev) => prev.map((l) => ({ ...l, visible: true, opacity: l.type === "polygon" && l.name.toLowerCase().includes("tehsil") ? 0.85 : 0.9 })));
+    setResetCounter((prev) => prev + 1);
+    // Restore initial state: only district boundary visible, polygons hollow white
+    setLayers((prev) =>
+      prev.map((l) => ({
+        ...l,
+        visible: l.name.toLowerCase() === "usn-district-boundary",
+        color: l.type === "polygon" ? "#ffffff" : l.color,
+        fillColor: l.type === "polygon" ? "transparent" : l.fillColor,
+        fillOpacity: l.type === "polygon" ? 0 : l.fillOpacity,
+        opacity: l.type === "polygon" && l.name.toLowerCase().includes("tehsil") ? 0.85 : 0.9,
+      }))
+    );
   };
 
   return (
@@ -395,6 +413,7 @@ export default function App() {
               measureMode={measureMode}
               measurePoints={measurePoints}
               setMeasurePoints={setMeasurePoints}
+              resetCounter={resetCounter}
             />
 
             {/* Right Pane Attribute Table */}

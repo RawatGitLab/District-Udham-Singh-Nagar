@@ -1,5 +1,5 @@
 {
-  "name": "Udham Singh Nagar- A Geographic Perspective",
+  "name": "Geography of District Udhan-Singh-Nagar for Planners and Administrators",
   "description": "A full-stack geographic information system (GIS) application to fetch, explore, and visualize geographical boundaries, landmarks, rivers, blocks, and villages of Udham Singh Nagar.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]

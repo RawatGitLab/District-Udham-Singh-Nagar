@@ -9,15 +9,18 @@ dotenv.config();
 const app = express();
 const PORT = 3000;
 
-const MONGODB_URI = process.env.MONGODB_URI;
-const MONGODB_DB = process.env.MONGODB_DB;
-const MONGODB_COLLECTION = process.env.MONGODB_COLLECTION;
+const MONGODB_URI = process.env.MONGODB_URI || "mongodb+srv://varunrawatmailbox2507_db_user:GYVPiF8LG4HIbsSF@cluster0.8xfepsq.mongodb.net/?appName=Cluster0";
+const MONGODB_DB = process.env.MONGODB_DB || "Shapefile";
+const MONGODB_COLLECTION = process.env.MONGODB_COLLECTION || "UdhamSinghNagar";
 
 let mongoClient: MongoClient | null = null;
 
 async function getMongoClient() {
   if (!mongoClient) {
     try {
+      if (!MONGODB_URI) {
+        throw new Error("MONGODB_URI is not configured. Please define it in your environment variables or .env file.");
+      }
       mongoClient = new MongoClient(MONGODB_URI);
       await mongoClient.connect();
       console.log("Connected to MongoDB Atlas successfully.");
