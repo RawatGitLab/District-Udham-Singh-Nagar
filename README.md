@@ -1,128 +1,20 @@
-# 🗺️ District Udham-Singh-Nagar – GIS Viewer
+<div align="center">
+<img width="1200" height="475" alt="GHBanner" src="https://ai.google.dev/static/site-assets/images/share-ais-513315318.png" />
+</div>
 
-An interactive, map-based portal for **Udham-Singh-Nagar District**, built with React, TypeScript and Leaflet. The app lets citizens and administrators explore geospatial data, layers, and district information through a fast, modern web interface.
+# Run and deploy your AI Studio app
 
-> **Live demo:** https://district-udham-singh-nagar.onrender.com/
+This contains everything you need to run your app locally.
 
----
+View your app in AI Studio: https://ai.studio/apps/8d23292d-e959-49df-a133-239bf32f6668
 
-## 📖 About
+## Run Locally
 
-This repository hosts the **Udham-Singh-Nagar GIS Viewer** — a web application for visualizing geographic and administrative data for Udham-Singh-Nagar District, Uttarakhand.
+**Prerequisites:**  Node.js
 
-## ✨ Features
 
-- 🗺️ **Interactive mapping** with [Leaflet](https://leafletjs.com/) and [proj4](https://github.com/proj4js/proj4js) for coordinate/projection handling
-- ⚛️ **Modern frontend** built with React 19, TypeScript, and Vite
-- 🤖 **AI-assisted features** powered by the [`@google/genai`](https://www.npmjs.com/package/@google/genai) (Gemini) SDK
-- 🎨 **Styled with Tailwind CSS** and animated with [Motion](https://motion.dev/)
-- 🖥️ **Node/Express backend** (`server.ts`) serving the app and API routes
-- 🗄️ **MongoDB** integration for persisting application data
-- 🎛️ Icons via [Lucide](https://lucide.dev/)
-
-## 🛠️ Tech Stack
-
-| Layer | Technology |
-|---|---|
-| Frontend | React 19, TypeScript, Vite, Tailwind CSS |
-| Mapping | Leaflet, proj4 |
-| Backend | Node.js, Express, tsx |
-| Database | MongoDB |
-| Animation / UI | Motion, Lucide React |
-| Tooling | esbuild, TypeScript compiler |
-
-## 📂 Project Structure
-
-```
-District-Udham-Singh-Nagar/
-├── src/                  # Application source (components, map logic, etc.)
-├── index.html            # App entry HTML
-├── server.ts             # Express server entry point
-├── check-properties.js   # Utility/validation script
-├── metadata.json         # App metadata (used by AI Studio)
-├── vite.config.ts        # Vite build configuration
-├── tsconfig.json         # TypeScript configuration
-├── .env.example           # Environment variable template
-├── package.json
-└── README.md
-```
-
-## 🚀 Getting Started
-
-### Prerequisites
-
-- [Node.js](https://nodejs.org/) (LTS recommended)
-- npm
-
-### Installation
-
-```bash
-# Clone the repository
-git clone https://github.com/RawatGitLab/District-Udham-Singh-Nagar.git
-
-# Navigate into the project directory
-cd District-Udham-Singh-Nagar
-
-# Install dependencies
-npm install
-```
-
-### Environment Variables
-
-Copy `.env.example` to `.env` and fill in the required values:
-
-```bash
-cp .env.example .env
-```
-
-| Variable | Description |
-|---|---|
-| `APP_URL` | The URL where the app is hosted (used for self-referential links/callbacks) |
-
-### Available Scripts
-
-| Command | Description |
-|---|---|
-| `npm run dev` | Start the development server (`tsx server.ts`) |
-| `npm run build` | Build the frontend with Vite and bundle the server with esbuild |
-| `npm start` | Run the production build (`dist/server.cjs`) |
-| `npm run preview` | Preview the production Vite build |
-| `npm run lint` | Type-check the project (`tsc --noEmit`) |
-| `npm run clean` | Remove build artifacts |
-
-### Running Locally
-
-```bash
-npm run dev
-```
-
-Then open the URL printed in your terminal (typically `http://localhost:5173` or the port configured by Vite/Express).
-
-### Building for Production
-
-```bash
-npm run build
-npm start
-```
-
-## 🤝 Contributing
-
-Contributions are welcome!
-
-1. 🍴 Fork the repository
-2. 🌿 Create a feature branch: `git checkout -b feature/AmazingFeature`
-3. 💾 Commit your changes: `git commit -m 'Add some AmazingFeature'`
-4. 📤 Push to the branch: `git push origin feature/AmazingFeature`
-5. 🎉 Open a Pull Request
-
-## 📜 License
-
-This project is licensed under the MIT License. See the `LICENSE` file for details.
-
-## 📞 Contact
-
-For queries or issues related to this project, reach out via the repository's [Issues](https://github.com/RawatGitLab/District-Udham-Singh-Nagar/issues) page.
-
----
-
-<p align="center">Built for Udham-Singh-Nagar District 🏔️</p>
+1. Install dependencies:
+   `npm install`
+2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
+3. Run the app:
+   `npm run dev`
