@@ -4,6 +4,7 @@ import Sidebar from "./components/Sidebar";
 import MapComponent from "./components/MapComponent";
 import AttributeTable from "./components/AttributeTable";
 import Login from "./components/Login";
+import ThemeToggle from "./components/ThemeToggle";
 import { 
   Database, 
   Layers, 
@@ -25,13 +26,37 @@ export default function App() {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
     return localStorage.getItem("is_authenticated") === "true";
   });
+  const [theme, setTheme] = useState<"light" | "dark">(() => {
+    const saved = localStorage.getItem("app_theme");
+    return saved === "dark" || saved === "light" ? saved : "light";
+  });
+
+  // Map & Interaction state
+  const [activeBaseMap, setActiveBaseMap] = useState<string>("osm");
+
+  useEffect(() => {
+    const root = document.documentElement;
+    const body = document.body;
+    if (theme === "dark") {
+      root.classList.add("dark");
+      body.classList.add("dark");
+      root.setAttribute("data-theme", "dark");
+    } else {
+      root.classList.remove("dark");
+      body.classList.remove("dark");
+      root.setAttribute("data-theme", "light");
+    }
+    localStorage.setItem("app_theme", theme);
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme((prev) => (prev === "dark" ? "light" : "dark"));
+  };
+
   const [features, setFeatures] = useState<GisFeature[]>([]);
   const [layers, setLayers] = useState<LayerConfig[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-
-  // Map & Interaction state
-  const [activeBaseMap, setActiveBaseMap] = useState<string>("osm");
   const [selectedFeature, setSelectedFeature] = useState<GisFeature | null>(null);
   const [hoveredFeature, setHoveredFeature] = useState<GisFeature | null>(null);
   const [isTableCollapsed, setIsTableCollapsed] = useState<boolean>(true);
@@ -310,36 +335,39 @@ export default function App() {
   };
 
   return (
-    <div className="flex flex-col h-screen w-screen bg-slate-100 overflow-hidden font-sans">
-      {/* Visual Navigation Header */}
-      <header className="h-14 bg-slate-900 text-slate-100 px-4 flex items-center justify-between border-b border-slate-950 shrink-0 select-none shadow-md">
+    <div className="flex flex-col h-screen w-screen bg-slate-100 dark:bg-slate-950 text-slate-900 dark:text-slate-100 overflow-hidden font-sans transition-colors duration-200">
+      {/* Visual Navigation Header - Always Dark Theme */}
+      <header className="h-14 bg-slate-900 text-slate-100 px-4 flex items-center justify-between border-b border-slate-800 shrink-0 select-none shadow-sm transition-colors duration-200 relative z-[10000]">
         <div className="flex items-center space-x-3">
           <div className="bg-indigo-600 p-1.5 rounded-lg text-white shadow-sm flex items-center justify-center">
             <Compass className="w-5 h-5 text-indigo-100" />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <span className="text-sm font-extrabold tracking-tight text-white uppercase">District Udham Singh Nagar</span>
+              <span className="text-sm font-extrabold tracking-tight uppercase text-white">District Udham Singh Nagar</span>
               <span className="text-[10px] bg-emerald-500/20 text-emerald-300 font-bold px-1.5 py-0.5 rounded border border-emerald-500/30 animate-pulse">
                 Live Server
               </span>
             </div>
-            <h2 className="text-base font-bold tracking-tight text-slate-200">A Geographic Perspective</h2>
+            <h2 className="text-xs sm:text-sm font-bold tracking-tight text-slate-300">A Geographic Perspective</h2>
           </div>
         </div>
 
-        {/* Global summary specs & User Profile */}
-        <div className="flex items-center space-x-3 text-xs font-semibold text-slate-300">
-          <div className="hidden md:flex items-center space-x-3">
-            <div className="flex items-center gap-1.5 bg-slate-800 px-2.5 py-1 rounded">
+        {/* Global summary specs, Theme Toggle & User Profile */}
+        <div className="flex items-center space-x-2.5 text-xs font-semibold">
+          <div className="hidden md:flex items-center space-x-2.5">
+            <div className="flex items-center gap-1.5 bg-slate-800 text-slate-300 border border-slate-700 px-2.5 py-1 rounded-lg">
               <Layers className="w-3.5 h-3.5 text-indigo-400" />
               <span>Layers: <strong className="text-white font-mono">{layers.length}</strong></span>
             </div>
-            <div className="flex items-center gap-1.5 bg-slate-800 px-2.5 py-1 rounded">
+            <div className="flex items-center gap-1.5 bg-slate-800 text-slate-300 border border-slate-700 px-2.5 py-1 rounded-lg">
               <Database className="w-3.5 h-3.5 text-pink-400" />
               <span>Entities: <strong className="text-white font-mono">{features.length}</strong></span>
             </div>
           </div>
+
+          {/* Fully functional ThemeToggle component */}
+          <ThemeToggle theme={theme} onToggle={toggleTheme} />
 
           {isAuthenticated ? (
             <button
@@ -347,14 +375,14 @@ export default function App() {
                 localStorage.removeItem("is_authenticated");
                 setIsAuthenticated(false);
               }}
-              className="flex items-center gap-1.5 bg-red-600 hover:bg-red-700 active:bg-red-800 text-white px-3 py-1.5 rounded-lg border border-red-500/80 transition-colors shadow-sm cursor-pointer ml-2"
+              className="flex items-center gap-1.5 bg-red-600 hover:bg-red-700 active:bg-red-800 text-white px-3 py-1.5 rounded-lg border border-red-500/80 transition-colors shadow-sm cursor-pointer ml-1 font-medium text-xs"
               title="Sign Out of Geoportal"
             >
               <LogOut className="w-3.5 h-3.5 text-red-100" />
-              <span className="hidden sm:inline font-medium">Sign Out</span>
+              Sign Out
             </button>
           ) : (
-            <div className="flex items-center gap-1.5 bg-indigo-900/60 text-indigo-200 px-3 py-1.5 rounded-lg border border-indigo-700/50">
+            <div className="flex items-center gap-1.5 bg-indigo-950/80 text-indigo-200 px-3 py-1.5 rounded-lg border border-indigo-800/80">
               <span className="font-semibold text-[11px]">Authentication Required</span>
             </div>
           )}
