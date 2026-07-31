@@ -344,12 +344,12 @@ export default function App() {
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <span className="text-sm font-extrabold tracking-tight uppercase text-white">District Udham Singh Nagar</span>
+              <span className="text-sm font-extrabold tracking-tight uppercase text-white">Geography For District Planners/Administrators</span>
               <span className="text-[10px] bg-emerald-500/20 text-emerald-300 font-bold px-1.5 py-0.5 rounded border border-emerald-500/30 animate-pulse">
                 Live Server
               </span>
             </div>
-            <h2 className="text-xs sm:text-sm font-bold tracking-tight text-slate-300">A Geographic Perspective</h2>
+            <h2 className="text-xs sm:text-sm font-bold tracking-tight text-slate-300">District Udham Singh Nagar [Code: 067]</h2>
           </div>
         </div>
 
