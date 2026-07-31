@@ -171,16 +171,38 @@ export default function MapComponent({
       const geoJsonLayer = L.geoJSON(geoJsonData, {
         interactive: measureMode === "none",
         style: (feature: any) => {
-          const isPolygon = layerConf.type === "polygon";
-          const isLine = layerConf.type === "linestring";
-          return {
-            color: layerConf.color,
-            fillColor: isPolygon || isLine ? "transparent" : (layerConf.fillColor || layerConf.color),
-            weight: layerConf.weight,
-            opacity: layerConf.opacity,
-            fillOpacity: isPolygon || isLine ? 0 : (layerConf.fillOpacity * layerConf.opacity),
-            fill: !isPolygon && !isLine,
-          };
+          const geomType = feature?.geometry?.type?.toLowerCase() || "";
+          const isPolygon = layerConf.type === "polygon" || geomType.includes("polygon");
+          const isLine = layerConf.type === "linestring" || geomType.includes("line");
+
+          if (isPolygon) {
+            return {
+              color: layerConf.color,
+              fillColor: layerConf.fillColor || layerConf.color,
+              weight: layerConf.weight,
+              opacity: layerConf.opacity,
+              fillOpacity: layerConf.fillOpacity ? (layerConf.fillOpacity * layerConf.opacity) : 0.15,
+              fill: true,
+            };
+          } else if (isLine) {
+            return {
+              color: layerConf.color,
+              fillColor: "transparent",
+              weight: layerConf.weight,
+              opacity: layerConf.opacity,
+              fillOpacity: 0,
+              fill: false,
+            };
+          } else {
+            return {
+              color: layerConf.color,
+              fillColor: layerConf.fillColor || layerConf.color,
+              weight: layerConf.weight,
+              opacity: layerConf.opacity,
+              fillOpacity: layerConf.fillOpacity ? (layerConf.fillOpacity * layerConf.opacity) : 0.4,
+              fill: true,
+            };
+          }
         },
         pointToLayer: (feature: any, latlng: L.LatLng) => {
           return L.circleMarker(latlng, {
@@ -208,10 +230,32 @@ export default function MapComponent({
             mouseover: () => {
               setHoveredFeature(feature);
               if (layer instanceof L.Path) {
-                layer.setStyle({
-                  weight: layerConf.weight + 1.5,
-                  color: "#eab308", // Golden cursor border highlight
-                });
+                const geomType = feature?.geometry?.type?.toLowerCase() || "";
+                const isPoly = layerConf.type === "polygon" || geomType.includes("polygon");
+
+                if (isPoly) {
+                  layer.setStyle({
+                    weight: layerConf.weight + 2,
+                    color: "#f59e0b", // Golden boundary accent
+                    fillColor: layerConf.fillColor || layerConf.color || "#f59e0b",
+                    fillOpacity: 0.45, // Highlight whole inside polygon area
+                    fill: true,
+                  });
+                  if ((layer as any).bringToFront) {
+                    (layer as any).bringToFront();
+                  }
+                } else if (layerConf.type === "linestring" || geomType.includes("line")) {
+                  layer.setStyle({
+                    weight: layerConf.weight + 2.5,
+                    color: "#f59e0b",
+                  });
+                } else {
+                  layer.setStyle({
+                    weight: layerConf.weight + 1.5,
+                    color: "#eab308",
+                    fillOpacity: Math.min((layerConf.fillOpacity || 0.4) + 0.3, 0.9),
+                  });
+                }
               }
             },
             mouseout: () => {
@@ -223,6 +267,9 @@ export default function MapComponent({
             click: (e: L.LeafletMouseEvent) => {
               onFeatureSelect(feature);
               setIsTableCollapsed(false);
+              if (e.originalEvent && e.originalEvent.target && typeof (e.originalEvent.target as any).blur === "function") {
+                (e.originalEvent.target as any).blur();
+              }
               L.DomEvent.stopPropagation(e);
             },
           });
@@ -268,8 +315,9 @@ export default function MapComponent({
     setMapSearchQuery(label);
 
     try {
-      // Find the geometry and create a high contrast flashing highlight above it
+      // Find the geometry and create a high contrast highlight above it
       const highlightLayer = L.geoJSON(selectedFeature as any, {
+        interactive: false,
         style: {
           color: "#dc2626", // Deep Red
           fillColor: "#fecaca",
@@ -451,23 +499,32 @@ export default function MapComponent({
     }
   }, [measurePoints, measureMode, mouseCoords]);
 
-  // 4.2 Listener for adding measurement points on map click
+  // 4.2 Listener for map clicks (measurement mode or clicking outside features)
   useEffect(() => {
     const map = mapInstanceRef.current;
     if (!map) return;
 
     const handleMapClick = (e: L.LeafletMouseEvent) => {
-      if (measureMode === "none") return;
-      
-      const newPoint = { lat: e.latlng.lat, lng: e.latlng.lng };
-      setMeasurePoints((prev) => [...prev, newPoint]);
+      if (measureMode !== "none") {
+        const newPoint = { lat: e.latlng.lat, lng: e.latlng.lng };
+        setMeasurePoints((prev) => [...prev, newPoint]);
+      } else {
+        // Deactivate hover effect & clear active feature selection when clicking outside polygons
+        setHoveredFeature(null);
+        onFeatureSelect(null);
+        Object.values(geojsonLayersRef.current).forEach((gLayer: any) => {
+          if (gLayer && typeof gLayer.resetStyle === "function") {
+            gLayer.resetStyle();
+          }
+        });
+      }
     };
 
     map.on("click", handleMapClick);
     return () => {
       map.off("click", handleMapClick);
     };
-  }, [measureMode, setMeasurePoints]);
+  }, [measureMode, setMeasurePoints, setHoveredFeature, onFeatureSelect]);
 
   // 5. Invalidate map layout size dynamically on container state toggles
   useEffect(() => {

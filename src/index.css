@@ -2,6 +2,27 @@
 
 @variant dark (&:where(.dark, .dark *));
 
+/* Remove default browser focus outline/black square around Leaflet vector paths and SVG shapes */
+.leaflet-container path,
+.leaflet-container svg path,
+.leaflet-container .leaflet-interactive,
+.leaflet-interactive,
+path.leaflet-interactive {
+  outline: none !important;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.leaflet-container path:focus,
+.leaflet-container svg path:focus,
+.leaflet-container .leaflet-interactive:focus,
+.leaflet-interactive:focus,
+path.leaflet-interactive:focus,
+.leaflet-marker-icon:focus,
+.leaflet-container :focus {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
 /* Leaflet Dark Theme Overrides */
 .dark .leaflet-container {
   background-color: #020617 !important;
