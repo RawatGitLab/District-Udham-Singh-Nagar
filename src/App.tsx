@@ -25,7 +25,7 @@ export default function App() {
   const [error, setError] = useState<string | null>(null);
 
   // Map & Interaction state
-  const [activeBaseMap, setActiveBaseMap] = useState<string>("satellite");
+  const [activeBaseMap, setActiveBaseMap] = useState<string>("osm");
   const [selectedFeature, setSelectedFeature] = useState<GisFeature | null>(null);
   const [hoveredFeature, setHoveredFeature] = useState<GisFeature | null>(null);
   const [isTableCollapsed, setIsTableCollapsed] = useState<boolean>(true);
@@ -217,9 +217,9 @@ export default function App() {
         fillColor = `hsl(${hue}, 70%, 65%)`;
       }
 
-      // Overriding for polygon layers (hollow, no fill, only white boundary color)
+      // Overriding for polygon layers (hollow, no fill, only black boundary color)
       if (type === "polygon") {
-        color = "#ffffff";
+        color = "#000000";
         fillColor = "transparent";
         fillOpacity = 0;
       }
