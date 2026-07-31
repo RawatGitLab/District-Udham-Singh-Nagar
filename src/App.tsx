@@ -3,6 +3,7 @@ import { GisFeature, LayerConfig, BaseMap } from "./types";
 import Sidebar from "./components/Sidebar";
 import MapComponent from "./components/MapComponent";
 import AttributeTable from "./components/AttributeTable";
+import Login from "./components/Login";
 import { 
   Database, 
   Layers, 
@@ -15,10 +16,15 @@ import {
   AlertCircle, 
   Sparkles, 
   Info,
-  ServerCrash
+  ServerCrash,
+  LogOut,
+  UserCheck
 } from "lucide-react";
 
 export default function App() {
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
+    return localStorage.getItem("is_authenticated") === "true";
+  });
   const [features, setFeatures] = useState<GisFeature[]>([]);
   const [layers, setLayers] = useState<LayerConfig[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -322,21 +328,45 @@ export default function App() {
           </div>
         </div>
 
-        {/* Global summary specs */}
-        <div className="hidden md:flex items-center space-x-4 text-xs font-semibold text-slate-300">
-          <div className="flex items-center gap-1.5 bg-slate-800 px-2.5 py-1 rounded">
-            <Layers className="w-3.5 h-3.5 text-indigo-400" />
-            <span>Layers: <strong className="text-white font-mono">{layers.length}</strong></span>
+        {/* Global summary specs & User Profile */}
+        <div className="flex items-center space-x-3 text-xs font-semibold text-slate-300">
+          <div className="hidden md:flex items-center space-x-3">
+            <div className="flex items-center gap-1.5 bg-slate-800 px-2.5 py-1 rounded">
+              <Layers className="w-3.5 h-3.5 text-indigo-400" />
+              <span>Layers: <strong className="text-white font-mono">{layers.length}</strong></span>
+            </div>
+            <div className="flex items-center gap-1.5 bg-slate-800 px-2.5 py-1 rounded">
+              <Database className="w-3.5 h-3.5 text-pink-400" />
+              <span>Entities: <strong className="text-white font-mono">{features.length}</strong></span>
+            </div>
           </div>
-          <div className="flex items-center gap-1.5 bg-slate-800 px-2.5 py-1 rounded">
-            <Database className="w-3.5 h-3.5 text-pink-400" />
-            <span>Entities: <strong className="text-white font-mono">{features.length}</strong></span>
-          </div>
+
+          {isAuthenticated ? (
+            <button
+              onClick={() => {
+                localStorage.removeItem("is_authenticated");
+                setIsAuthenticated(false);
+              }}
+              className="flex items-center gap-1.5 bg-red-600 hover:bg-red-700 active:bg-red-800 text-white px-3 py-1.5 rounded-lg border border-red-500/80 transition-colors shadow-sm cursor-pointer ml-2"
+              title="Sign Out of Geoportal"
+            >
+              <LogOut className="w-3.5 h-3.5 text-red-100" />
+              <span className="hidden sm:inline font-medium">Sign Out</span>
+            </button>
+          ) : (
+            <div className="flex items-center gap-1.5 bg-indigo-900/60 text-indigo-200 px-3 py-1.5 rounded-lg border border-indigo-700/50">
+              <span className="font-semibold text-[11px]">Authentication Required</span>
+            </div>
+          )}
         </div>
       </header>
 
       {/* Main Core GIS Workspace Layout */}
       <main className="flex-1 flex overflow-hidden min-h-0 relative">
+        {/* Render Login Overlay over the live background when unauthenticated */}
+        {!isAuthenticated && (
+          <Login onLoginSuccess={() => setIsAuthenticated(true)} />
+        )}
         {loading ? (
           <div className="absolute inset-x-0 inset-y-0 bg-slate-900/90 backdrop-blur-sm flex flex-col items-center justify-center z-50 p-6 select-none font-sans">
             <div className="bg-slate-800 border border-slate-700/80 p-8 rounded-2xl shadow-2xl flex flex-col items-center max-w-sm text-center">
